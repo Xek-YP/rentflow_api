@@ -3,19 +3,22 @@ from .models import RentalListing, Booking, User
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор пользователей."""
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name')
-        read_only_dields = ('id',)
+        fields = (
+            'id', 'username', 'email', 'first_name', 'last_name'
+        )
+        read_only_fields = ('id',)
 
 
 class RentalListingSerializer(serializers.ModelSerializer):
+    """Сериализатор объекта недвижимости."""
     owner = UserSerializer(read_only=True)
 
     class Meta:
         model = RentalListing
-        fields =(
-            'id',
+        fields = (
             'title',
             'description',
             'address',
@@ -32,22 +35,26 @@ class RentalListingSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         )
-        read_only_fields = ('owner', 'created_at', 'updated_at')
+        read_only_fields = (
+            'owner',
+            'created_at',
+            'updated_at'
+        )
 
 
 class BookingSerializer(serializers.ModelSerializer):
-    guest = UserSerializer(read_only=True)
+    """Сериализатор бронирования объекта."""
     rental_listing = RentalListingSerializer(read_only=True)
+    guest = UserSerializer(read_only=True)
     rental_listing_id = serializers.PrimaryKeyRelatedField(
-        queryset=RentalListing.objects.all(),
+        queryset=RentalListing.objects.all(), 
         source='rental_listing',
         write_only=True
     )
-
     class Meta:
         model = Booking
         fields = (
-            'rental_listing_id',
+            'id_rental_listing',
             'rental_listing',
             'guest',
             'check_in_date',
@@ -58,4 +65,11 @@ class BookingSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         )
-        read_only_fields = ('guest', 'total_price', 'created_at', 'updated_at')
+        read_only_fields = (
+            'guest',
+            'total_price',
+            'created_at',
+            'updated_at',
+            'check_in_date',
+            'check_out_date'
+        )
